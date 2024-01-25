@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p id="demo"></p>
+
+<script>
+var parser1, xmlDoc1;
+var parser2, xmlDoc2;
+
+var map1 = new Map();
+var map2 = new Map();
+var map3 = new Map();
+
+
+var text1 = "<Package xmlns='http://soap.sforce.com/2006/04/metadata'>    <types>        <members>test1</members>        <members>test2</members><name>ApexClass</name>    </types></Package>";
+
+var text2 = "<Package xmlns='http://soap.sforce.com/2006/04/metadata'>    <types>        <members>test11</members>        <members>test2</members><name>ApexClass</name>    </types></Package>";
+
+
+
+parser1 = new DOMParser();
+xmlDoc1 = parser1.parseFromString(text1,"text/xml");
+
+parser2 = new DOMParser();
+xmlDoc2 = parser2.parseFromString(text2,"text/xml");
+
+
+for (let key of xmlDoc1.getElementsByTagName("types")) {
+  let mySet1 = new Set();
+  for (let arrVal of key.getElementsByTagName("members")) {
+    mySet1.add(arrVal.firstChild.nodeValue);
+  }
+  map1.set(key.getElementsByTagName("name")[0].firstChild.nodeValue, mySet1 );
+}
+console.log(map1);
+
+for (let key of xmlDoc2.getElementsByTagName("types")) {
+  let mySet2 = new Set();
+  for (let arrVal of key.getElementsByTagName("members")) {
+    mySet2.add(arrVal.firstChild.nodeValue);
+  }
+  map2.set(key.getElementsByTagName("name")[0].firstChild.nodeValue, mySet2 );
+}
+console.log(map2);
+
+
+
+
+for (let key of map1.keys()) {
+  const setTemp = new Set();
+  for(let item of map1.get(key)) {
+    setTemp.add(item);
+  }
+    
+  if(map2.has(key)){  	
+    for(let item of map2.get(key)) {
+      setTemp.add(item);
+    }    
+  }
+  map3.set(key, setTemp);
+}
+
+
+for (let key of map2.keys()) {
+  if(!map3.has(key)){  	
+    const setTemp = new Set();
+    for(let item of map2.get(key)) {
+      setTemp.add(item);
+    }  
+    map3.set(key, setTemp);
+  }  
+}
+
+
+
+
+
+var text3 = "<types>";
+
+for (let key of map3.keys()) {
+  for (let arrVal of map3.get(key)) {
+  	text3 += "<members>"+ arrVal +"</members>";
+  }
+  text3 += "<name>" + key + "</name>";
+  text3 += "</types><types>";
+}
+
+console.log(text3);
+
+
+
+
+
+//[0].childNodes[0].nodeValue;
+</script>
+
+</body>
+</html>
